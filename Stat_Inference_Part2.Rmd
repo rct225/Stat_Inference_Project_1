@@ -1,0 +1,50 @@
+---
+title: "Statistical Inference Project 1 - Part 2"
+author: "Robert Tuck"
+date: "June 20, 2015"
+output: html_document
+---
+
+### Overview
+Analysis of the TootGrowth data in the R datasets package.  The ToothGrowth dataset in R is data from a study titled "The Effect of Vitamin C on Tooth Growth in Guinea Pigs".  The data records the length of the teeth in 10 guinea pigs at three levels of Vitamin C (0.5, 1, and 2mg) with thwo delivery methods (orange juice or ascorbic acid)
+
+### Basic Data Summry
+```{r}
+# load the data
+library(ggplot2)
+tooth_data <- data.frame(ToothGrowth)
+summary(tooth_data)
+tooth_data$dose <- as.factor(tooth_data$dose)
+ggplot(aes(x=dose, y=len), data=tooth_data) + geom_boxplot(aes(fill=dose))
+ggplot(aes(x=supp, y=len), data=tooth_data) + geom_boxplot(aes(fill=supp))
+```
+### Tests to compare tooth growth by supplement type and dose
+Using a t-test to see if supplement type has any effect on tooth growth
+```{r}
+t.test(len ~ supp, data = tooth_data)
+```
+The p-value is 0.06, which indicates that the type of supplement likely has no significant effect on tooth growth.
+
+Perform a pair-wise t-test analysis on changes in dosage to see the effect of dose on tooth length
+```{r}
+doses_0.5_1 <- subset(tooth_data, dose %in% c(0.5, 1))
+doses_0.5_2 <- subset(tooth_data, dose %in% c(0.5, 2))
+doses_1_2 <- subset(tooth_data, dose %in% c(1, 2))
+
+t.test(len ~ dose, data = doses_0.5_1)
+t.test(len ~ dose, data = doses_0.5_2)
+t.test(len ~ dose, data = doses_1_2)
+```
+
+For all three pairs, the p-value is less than 0.05 and the confidence interval doesn't contain zero.  This indicates that tooth growth increases as dose level increases. 
+
+### Conclusions
+
+1. Supplement type has no effect on tooth growth.
+2. Inreasing the dose level leads to increased tooth growth.
+
+### Assumptions
+
+We assume the experiment was performed by randomly assigning guniea pigs to dosage levels and supplement type.
+We assume the guniea pigs in this experiment are representative of all guniea pigs.
+We assume all of the variances in the groups are equal in the t-tests.
